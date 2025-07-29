@@ -1056,6 +1056,262 @@
       transform: scale(1.05);
     }
     
+    /* ========== NEW STYLES FOR ADDED FEATURES ========== */
+    
+    /* Stadium Background */
+    .stadium-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://example.com/stadium.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: -1;
+    }
+    
+    /* Crowd Animation */
+    @keyframes crowdCheer {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+    
+    .crowd-animation {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 20%;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      z-index: -1;
+      animation: crowdCheer 2s infinite;
+    }
+    
+    /* Pitch Design */
+    .pitch {
+      position: fixed;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 5px;
+      background: linear-gradient(to right, #8B4513, #CD853F, #8B4513);
+      border-radius: 5px;
+      z-index: -1;
+    }
+    
+    /* Live Score Ticker */
+    .score-ticker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 5px 0;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      z-index: 100;
+    }
+    
+    .ticker-content {
+      display: inline-block;
+      padding-left: 100%;
+      animation: ticker 30s linear infinite;
+    }
+    
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    
+    /* Mini Scorecard */
+    .mini-scorecard {
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      background: rgba(13, 42, 82, 0.9);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 90;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    /* Player Spotlight */
+    .player-spotlight {
+      box-shadow: 0 0 15px rgba(255,215,0,0.7);
+      transition: all 0.3s;
+    }
+    
+    /* Card Animations */
+    @keyframes cardFlip {
+      0% { transform: rotateY(0); }
+      50% { transform: rotateY(90deg); }
+      100% { transform: rotateY(0); }
+    }
+    
+    .card-animation {
+      animation: cardFlip 0.6s ease-in-out;
+    }
+    
+    @keyframes boundaryGlow {
+      0% { box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+      50% { box-shadow: 0 0 20px gold; }
+      100% { box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+    }
+    
+    .boundary-glow {
+      animation: boundaryGlow 1s infinite;
+    }
+    
+    /* Wicket Animations */
+    @keyframes wicketShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .wicket-shake {
+      animation: wicketShake 0.5s;
+    }
+    
+    /* DRS System */
+    .drs-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 100;
+    }
+    
+    .drs-button {
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .drs-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    
+    .drs-reviews {
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    
+    /* Newspaper-style Summary */
+    .newspaper-summary {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+      color: black;
+    }
+    
+    .newspaper-header {
+      font-family: 'Times New Roman', Times, serif;
+      border-bottom: 2px solid black;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .newspaper-title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+    
+    .newspaper-date {
+      text-align: center;
+      font-style: italic;
+    }
+    
+    .newspaper-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .newspaper-section {
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+    
+    .newspaper-section-title {
+      font-weight: bold;
+      border-bottom: 1px solid black;
+      margin-bottom: 10px;
+    }
+    
+    /* Player Reactions */
+    .player-reaction {
+      position: absolute;
+      font-size: 24px;
+      z-index: 10;
+      animation: fadeInOut 2s forwards;
+    }
+    
+    /* Match Momentum Indicator */
+    .momentum-bar {
+      height: 5px;
+      width: 100%;
+      background: linear-gradient(to right, #f44336, #ffeb3b, #4CAF50);
+      margin: 5px 0;
+      position: relative;
+    }
+    
+    .momentum-indicator {
+      position: absolute;
+      top: -5px;
+      width: 10px;
+      height: 15px;
+      background: white;
+      border-radius: 3px;
+      transform: translateX(-50%);
+    }
+    
+    /* 3/5/10 Wicket Haul Indicators */
+    .wicket-haul {
+      position: absolute;
+      top: -25px;
+      right: 0;
+      background: #f44336;
+      color: white;
+      padding: 2px 5px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .newspaper-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .drs-container {
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+      }
+    }
+    
     /* Responsive Styles */
     @media (max-width: 768px) {
       .card-btns button {
@@ -1141,6 +1397,63 @@
   
 </head>
 <body>
+  <!-- New visual elements -->
+  <div class="stadium-background"></div>
+  <div class="crowd-animation"></div>
+  <div class="pitch"></div>
+  
+  <div class="score-ticker">
+    <div class="ticker-content" id="tickerContent">
+      LIVE: <span id="tickerScore">0/0</span> | Overs: <span id="tickerOvers">0.0</span> | RR: <span id="tickerRR">0.00</span> | 
+      Partnership: <span id="tickerPartnership">0 (0)</span> | Target: <span id="tickerTarget">-</span>
+    </div>
+  </div>
+  
+  <div class="mini-scorecard" id="miniScorecard">
+    <div><strong id="miniScore">0/0</strong> (<span id="miniOvers">0.0</span>)</div>
+    <div>RR: <span id="miniRR">0.00</span> | Target: <span id="miniTarget">-</span></div>
+  </div>
+  
+  <!-- DRS System -->
+  <div class="drs-container" id="drsContainer">
+    <button class="drs-button" id="drsButton">Review (DRS)</button>
+    <div class="drs-reviews" id="drsReviews">Reviews: 1 remaining</div>
+  </div>
+  
+  <!-- Newspaper-style Summary -->
+  <div class="newspaper-summary" id="newspaperSummary">
+    <div class="newspaper-header">
+      <div class="newspaper-title">The HandiCricket Times</div>
+      <div class="newspaper-date" id="newspaperDate"></div>
+    </div>
+    
+    <div class="newspaper-grid">
+      <div class="newspaper-section">
+        <div class="newspaper-section-title">MATCH SUMMARY</div>
+        <div id="newspaperMatchSummary"></div>
+      </div>
+      
+      <div class="newspaper-section">
+        <div class="newspaper-section-title">PLAYER OF THE MATCH</div>
+        <div id="newspaperPlayerOfMatch"></div>
+      </div>
+      
+      <div class="newspaper-section">
+        <div class="newspaper-section-title">BATTING CARD</div>
+        <div id="newspaperBattingCard"></div>
+      </div>
+      
+      <div class="newspaper-section">
+        <div class="newspaper-section-title">BOWLING CARD</div>
+        <div id="newspaperBowlingCard"></div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="closeNewspaper">Close</button>
+    </div>
+  </div>
+
   <div class="container">
     
     <div class="team-names-compact">
@@ -1510,6 +1823,13 @@
     let chasingTeam = null;
     let secondInningsStarted = false;
 
+    // New feature variables
+    let drsReviewsAvailable = 1;
+    let batterMomentum = 0;
+    let bowlerMomentum = 0;
+    let matchMomentum = 0.5; // 0 to 1 scale
+    let wicketHauls = {}; // Track 3/5/10 wicket hauls
+
     // DOM elements
     const resultEl = document.getElementById("result");
     const scoreboard = document.querySelector(".scorebox");
@@ -1555,6 +1875,9 @@
     const summaryHighlight = document.getElementById("summaryHighlight");
     const targetDisplay = document.getElementById("targetDisplay");
     const targetValue = document.getElementById("targetValue");
+    const drsButton = document.getElementById("drsButton");
+    const drsReviews = document.getElementById("drsReviews");
+    const closeNewspaperBtn = document.getElementById("closeNewspaper");
 
     // Helper function with timeout
     async function setWithTimeout(ref, value, timeoutMs, timeoutMsg) {
@@ -1641,6 +1964,7 @@
         batterWickets[player] = batterWickets[player] || 0;
         batterPenalties[player] = batterPenalties[player] || 0;
         lastBatterRuns[player] = 0;
+        wicketHauls[player] = 0;
       });
       
       team2Players.forEach(player => {
@@ -1651,6 +1975,7 @@
         batterWickets[player] = batterWickets[player] || 0;
         batterPenalties[player] = batterPenalties[player] || 0;
         lastBatterRuns[player] = 0;
+        wicketHauls[player] = 0;
       });
     }
 
@@ -1658,10 +1983,12 @@
     function initializeBowlerStats() {
       team1Players.forEach(player => {
         bowlerStats[player] = bowlerStats[player] || { wickets: 0, runs: 0, overs: 0 };
+        wicketHauls[player] = 0;
       });
       
       team2Players.forEach(player => {
         bowlerStats[player] = bowlerStats[player] || { wickets: 0, runs: 0, overs: 0 };
+        wicketHauls[player] = 0;
       });
     }
 
@@ -1845,6 +2172,38 @@
       }
     }
 
+    // Update ticker and mini scorecard
+    function updateTicker() {
+      const partnership = runs - lastWicketScore;
+      const partnershipBalls = legalBalls - (fallOfWickets[fallOfWickets.length-1]?.ball || 0);
+      
+      document.getElementById('tickerScore').textContent = `${runs}/${Math.floor(wickets)}`;
+      document.getElementById('tickerOvers').textContent = `${Math.floor(legalBalls/6)}.${legalBalls%6}`;
+      document.getElementById('tickerRR').textContent = (runs / (legalBalls/6)).toFixed(2);
+      document.getElementById('tickerPartnership').textContent = `${partnership} (${partnershipBalls})`;
+      document.getElementById('tickerTarget').textContent = secondInningsStarted ? target : '-';
+      
+      // Mini scorecard
+      document.getElementById('miniScore').textContent = `${runs}/${Math.floor(wickets)}`;
+      document.getElementById('miniOvers').textContent = `${Math.floor(legalBalls/6)}.${legalBalls%6}`;
+      document.getElementById('miniRR').textContent = (runs / (legalBalls/6)).toFixed(2);
+      document.getElementById('miniTarget').textContent = secondInningsStarted ? target : '-';
+    }
+
+    // Update match momentum
+    function updateMatchMomentum() {
+      const runRate = runs / (legalBalls / 6);
+      const expectedRR = currentFormat.totalOvers > 20 ? 5 : 8;
+      matchMomentum = 0.5 + (runRate - expectedRR) * 0.05;
+      matchMomentum = Math.max(0, Math.min(1, matchMomentum));
+      
+      // Update momentum indicator
+      const indicator = document.getElementById('momentumIndicator');
+      if (indicator) {
+        indicator.style.left = `${matchMomentum * 100}%`;
+      }
+    }
+
     // Update all displays
     function updateAllDisplays() {
       updateScoreboard();
@@ -1854,6 +2213,18 @@
       updateLast5Overs();
       updateCurrentTime();
       updatePlayerComparison();
+      updateTicker();
+      updateMatchMomentum();
+      
+      // Add player spotlight
+      if (currentBatter) {
+        const batterEl = document.querySelector(`.batter-item[data-name="${currentBatter}"]`);
+        if (batterEl) batterEl.classList.add('player-spotlight');
+      }
+      if (currentBowler) {
+        const bowlerEl = document.querySelector(`.player-item[data-name="${currentBowler}"]`);
+        if (bowlerEl) bowlerEl.classList.add('player-spotlight');
+      }
     }
 
     // Update over summary
@@ -2134,11 +2505,16 @@
         if (boundary) {
           resultEl.classList.add("boundary-animation");
           document.getElementById('runs').classList.add("boundary-flash");
+          // Add boundary animation to card
+          const card = document.querySelector(`.btn[data-value="${batterCard}"]`);
+          if (card) card.classList.add('boundary-glow');
         }
         if (isWicket) {
           resultEl.classList.add("wicket-animation");
           document.getElementById('wickets').classList.add("score-change");
           document.querySelector('.scorebox-main').classList.add("wicket-flash");
+          // Add wicket animation
+          document.querySelector('.scorebox-main').classList.add('wicket-shake');
         }
         if (runsScored > 0) {
           document.getElementById('runs').classList.add("score-change");
@@ -2149,7 +2525,9 @@
           resultEl.classList.remove("boundary-animation", "wicket-animation");
           document.getElementById('runs').classList.remove("score-change", "boundary-flash");
           document.getElementById('wickets').classList.remove("score-change");
-          document.querySelector('.scorebox-main').classList.remove("wicket-flash");
+          document.querySelector('.scorebox-main').classList.remove("wicket-flash", "wicket-shake");
+          const card = document.querySelector(`.btn[data-value="${batterCard}"]`);
+          if (card) card.classList.remove('boundary-glow');
         }, 2000);
 
         // Check for innings end conditions
@@ -2996,6 +3374,200 @@
       });
     }
 
+    // Setup DRS system
+    function setupDRS() {
+      // Calculate reviews based on match format
+      const overs = currentFormat.totalOvers;
+      drsReviewsAvailable = overs >= 20 ? 2 : 1;
+      updateDRSDisplay();
+      
+      drsButton.addEventListener('click', async () => {
+        if (drsReviewsAvailable <= 0 || !isBatting || !ballByBall[legalBalls-1]?.wicket) {
+          return;
+        }
+        
+        const lastBall = ballByBall[legalBalls-1];
+        if (lastBall.runs > 3) {
+          showNotification("DRS not available for wickets with card value > 3", 'error');
+          return;
+        }
+        
+        disableButtons();
+        drsButton.disabled = true;
+        
+        // Animate DRS process
+        showNotification("Reviewing decision...", 'info');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Random chance of successful review (10-75%)
+        const successChance = Math.min(0.75, 0.1 + (batterMomentum * 0.65));
+        const isSuccessful = Math.random() < successChance;
+        
+        if (isSuccessful) {
+          // Successful review
+          showNotification("Decision overturned! Batter survives", 'batting');
+          addCommentary(`DRS review successful! ${currentBatter} survives`, 'info');
+          
+          // Reverse wicket effects
+          wickets -= getWicketValue();
+          batterWickets[currentBatter] = Math.max(0, batterWickets[currentBatter] - getWicketValue());
+          bowlerStats[currentBowler].wickets -= 1;
+          
+          // Add bonus run
+          runs += 1;
+          batterStats[currentBatter].runs += 1;
+          
+          // Update ball record
+          ballByBall[legalBalls-1].wicket = false;
+          ballByBall[legalBalls-1].runs += 1;
+          ballByBall[legalBalls-1].drs = { success: true };
+        } else {
+          // Unsuccessful review
+          showNotification("Original decision stands! Review lost", 'error');
+          addCommentary(`DRS review unsuccessful! ${currentBatter} remains out`, 'wicket');
+          ballByBall[legalBalls-1].drs = { success: false };
+        }
+        
+        drsReviewsAvailable--;
+        updateDRSDisplay();
+        updateAllDisplays();
+        enableButtons();
+      });
+    }
+    
+    function updateDRSDisplay() {
+      drsReviews.textContent = `Reviews: ${drsReviewsAvailable} remaining`;
+      drsButton.disabled = drsReviewsAvailable <= 0 || !isBatting;
+    }
+    
+    // Update batter momentum
+    function updateBatterMomentum(batter, runs, isBoundary) {
+      const increment = isBoundary ? 0.2 : 0.05 + (runs * 0.02);
+      batterMomentum = Math.min(1, batterMomentum + increment);
+      
+      // Check for momentum bonus
+      if (batterMomentum >= 1) {
+        showNotification(`${batter} is in the zone! Next wicket will be reduced`, 'batting');
+        batterMomentum = 0; // Reset after bonus is granted
+      }
+    }
+    
+    // Update bowler momentum
+    function updateBowlerMomentum(bowler, isWicket) {
+      const increment = isWicket ? 0.3 : 0.1;
+      bowlerMomentum = Math.min(1, bowlerMomentum + increment);
+      
+      if (bowlerMomentum >= 1) {
+        showNotification(`${bowler} is on fire! Next wicket will count double`, 'error');
+        bowlerMomentum = 0;
+      }
+    }
+    
+    // Check for wicket hauls (3/5/10)
+    function checkWicketHauls(bowler) {
+      const wickets = bowlerStats[bowler].wickets;
+      
+      if (wickets >= 3 && wicketHauls[bowler] < 3) {
+        showNotification(`${bowler} takes a 3-wicket haul!`, 'error');
+        wicketHauls[bowler] = 3;
+      }
+      if (wickets >= 5 && wicketHauls[bowler] < 5) {
+        showNotification(`${bowler} takes a 5-wicket haul! 🎉`, 'error');
+        createConfetti();
+        wicketHauls[bowler] = 5;
+      }
+      if (wickets >= 10 && wicketHauls[bowler] < 10) {
+        showNotification(`${bowler} takes a 10-wicket haul! 🏆`, 'error');
+        createConfetti();
+        wicketHauls[bowler] = 10;
+      }
+    }
+    
+    // Show newspaper-style summary
+    function showNewspaperSummary() {
+      const newspaper = document.getElementById('newspaperSummary');
+      const now = new Date();
+      
+      // Set date
+      document.getElementById('newspaperDate').textContent = now.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+      
+      // Set match summary
+      let summaryHTML = `<div style="font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px;">
+        ${team1NameDisplay.textContent} vs ${team2NameDisplay.textContent}
+      </div>`;
+      
+      if (secondInningsStarted) {
+        const winner = runs >= target ? battingFirst : (battingFirst === "player1" ? "player2" : "player1");
+        const winnerName = winner === "player1" ? team1NameDisplay.textContent : team2NameDisplay.textContent;
+        const margin = runs >= target ? `${currentFormat.totalWickets - wickets} wickets` : `${target - runs - 1} runs`;
+        
+        summaryHTML += `<div style="text-align: center; margin-bottom: 10px; font-size: 16px;">
+          <strong>${winnerName} won by ${margin}</strong>
+        </div>`;
+      }
+      
+      summaryHTML += `<div style="margin-bottom: 10px;">
+        <strong>First Innings:</strong> ${firstInningsData?.totalRuns || 0}/${firstInningsData?.totalWickets || 0}
+      </div>`;
+      
+      if (secondInningsStarted) {
+        summaryHTML += `<div style="margin-bottom: 10px;">
+          <strong>Second Innings:</strong> ${runs}/${wickets} (Target: ${target})
+        </div>`;
+      }
+      
+      document.getElementById('newspaperMatchSummary').innerHTML = summaryHTML;
+      
+      // Set player of the match (simplified logic)
+      let potm = "";
+      if (secondInningsStarted) {
+        // Find top scorer or wicket taker
+        const allBatters = Object.entries(batterStats);
+        const topBatter = allBatters.sort((a, b) => b[1].runs - a[1].runs)[0];
+        
+        const allBowlers = Object.entries(bowlerStats);
+        const topBowler = allBowlers.sort((a, b) => b[1].wickets - a[1].wickets)[0];
+        
+        if (topBatter[1].runs >= 30 || topBowler[1].wickets >= 3) {
+          potm = topBatter[1].runs >= 50 ? topBatter[0] : topBowler[0];
+        }
+      }
+      
+      document.getElementById('newspaperPlayerOfMatch').innerHTML = potm ? 
+        `<div style="text-align: center;">
+          <div style="font-size: 16px; font-weight: bold;">${potm}</div>
+          <div>${batterStats[potm]?.runs || bowlerStats[potm]?.wickets} ${batterStats[potm] ? 'runs' : 'wickets'}</div>
+        </div>` : 
+        "Match in progress";
+      
+      // Set batting card
+      let battingHTML = "";
+      const battingTeam = battingFirst === "player1" ? team1Players : team2Players;
+      battingTeam.forEach(player => {
+        const stats = batterStats[player] || { runs: 0, balls: 0 };
+        battingHTML += `<div style="margin-bottom: 5px;">
+          ${player}: ${stats.runs} (${stats.balls}) ${batterWickets[player] >= 1 ? 'out' : 'not out'}
+        </div>`;
+      });
+      document.getElementById('newspaperBattingCard').innerHTML = battingHTML;
+      
+      // Set bowling card
+      let bowlingHTML = "";
+      const bowlingTeam = battingFirst === "player1" ? team2Players : team1Players;
+      bowlingTeam.forEach(player => {
+        const stats = bowlerStats[player] || { wickets: 0, runs: 0, overs: 0 };
+        bowlingHTML += `<div style="margin-bottom: 5px;">
+          ${player}: ${stats.wickets}/${stats.runs} (${stats.overs.toFixed(1)})
+          ${wicketHauls[player] >= 3 ? `<span class="wicket-haul">${wicketHauls[player]}-fer</span>` : ''}
+        </div>`;
+      });
+      document.getElementById('newspaperBowlingCard').innerHTML = bowlingHTML;
+      
+      newspaper.style.display = 'block';
+    }
+
     // Initialize the game
     async function initGame() {
       try {
@@ -3093,6 +3665,7 @@
         setupCardButtons();
         setupFirebaseListeners();
         setupTeamsModal();
+        setupDRS();
         
         // Set up control buttons
         saveBtn.addEventListener("click", saveGameState);
@@ -3121,6 +3694,19 @@
 
         // Setup second innings button
         startSecondInningsBtn.addEventListener('click', startSecondInnings);
+
+        // Setup newspaper summary button
+        closeNewspaperBtn.addEventListener('click', () => {
+          document.getElementById('newspaperSummary').style.display = 'none';
+        });
+        
+        // Add button to show newspaper summary
+        const showSummaryBtn = document.createElement('button');
+        showSummaryBtn.textContent = '📰 Match Summary';
+        showSummaryBtn.style.margin = '10px auto';
+        showSummaryBtn.style.display = 'block';
+        showSummaryBtn.addEventListener('click', showNewspaperSummary);
+        document.querySelector('.container').appendChild(showSummaryBtn);
 
         // Initial UI update
         updateAllDisplays();
