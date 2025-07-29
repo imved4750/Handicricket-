@@ -1857,21 +1857,20 @@
     let db;
 
     try {
-      console.log("Initializing Firebase...");
-      app = initializeApp(firebaseConfig);
-      db = getDatabase(app);
-      console.log("Firebase initialized successfully");
-    } catch (error) {
-      console.error("Firebase initialization failed:", error);
-      document.getElementById("result").innerHTML = `
-        Failed to connect to game server.<br>
-        Please check your internet connection and refresh.<br>
-        <button onclick="location.reload()" style="margin-top:10px; padding: 8px 15px; background: #1e88e5; color: white; border: none; border-radius: 5px; cursor: pointer;">
-          Refresh Page
-        </button>
-      `;
-      document.getElementById("result").className = "error";
-      throw error;
+  app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  console.log("Firebase initialized successfully");
+} catch (error) {
+  console.error("Firebase initialization failed:", error);
+  document.getElementById("result").innerHTML = `
+    Failed to connect to game server.<br>
+    Please check your internet connection and refresh.<br>
+    <button onclick="location.reload()" style="margin-top:10px; padding: 8px 15px; background: #1e88e5; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Refresh Page
+    </button>
+  `;
+  document.getElementById("result").className = "error";
+  throw error; // This will stop further execution
     }
 
     // Get URL parameters
@@ -1880,15 +1879,15 @@
     const player = params.get('player');
     
     if (!room || !player) {
-      document.getElementById("result").innerHTML = `
-        Missing required parameters in URL.<br>
-        Please return to the main page and join the game again.<br>
-        <button onclick="window.location.href='index.html'" style="margin-top:10px; padding: 8px 15px; background: #1e88e5; color: white; border: none; border-radius: 5px; cursor: pointer;">
-          Return to Main Page
-        </button>
-      `;
-      document.getElementById("result").className = "error";
-      throw new Error("Missing room or player parameters");
+  document.getElementById("result").innerHTML = `
+    Missing required parameters in URL.<br>
+    Please return to the main page and join the game again.<br>
+    <button onclick="window.location.href='index.html'" style="margin-top:10px; padding: 8px 15px; background: #1e88e5; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Return to Main Page
+    </button>
+  `;
+  document.getElementById("result").className = "error";
+  throw new Error("Missing room or player parameters"); // Stop execution
     }
 
     const opponent = player === "player1" ? "player2" : "player1";
