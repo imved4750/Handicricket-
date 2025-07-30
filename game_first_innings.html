@@ -3550,7 +3550,22 @@ function initializeBowlerStats() {
         `;
         document.getElementById("result").className = "error";
     });
-  </script>
+  
+document.querySelectorAll('.confirm-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const modal = btn.closest('.modal');
+    if (!modal) return;
+    const selected = modal.querySelector('.player-item.selected');
+    if (selected) {
+      const playerName = selected.querySelector('.player-name').textContent;
+      console.log("Confirmed player:", playerName);
+      modal.classList.remove('active');
+    } else {
+      alert("Please select a player.");
+    }
+  });
+});
+</script>
 </body>
 </html>
 <script type="module">
@@ -4952,6 +4967,21 @@ initGame().catch(error => {
         Please refresh or check console for details.
     `;
     document.getElementById("result").className = "error";
+});
+
+document.querySelectorAll('.confirm-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const modal = btn.closest('.modal');
+    if (!modal) return;
+    const selected = modal.querySelector('.player-item.selected');
+    if (selected) {
+      const playerName = selected.querySelector('.player-name').textContent;
+      console.log("Confirmed player:", playerName);
+      modal.classList.remove('active');
+    } else {
+      alert("Please select a player.");
+    }
+  });
 });
 </script>
 </html>
