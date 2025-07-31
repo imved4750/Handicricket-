@@ -120,31 +120,11 @@ function generatePlayers(count, team) {
             runs: 0,
             balls: 0,
             wickets: 0,
-            isBowler: i <= 5 // First 5 players can bowl
+            isBowler: i <= 11. // First 5 players can bowl
         });
     }
     return players;
 }
-
-// Populate player selection lists
-function populatePlayerLists() {
-    const battersList = document.getElementById('batters-list');
-    const bowlersList = document.getElementById('bowlers-list');
-    
-    // Clear existing
-    battersList.innerHTML = '';
-    bowlersList.innerHTML = '';
-    
-    // Add batters from current innings team
-    const team = gameState.currentInnings === 1 ? gameState.team1 : gameState.team2;
-    
-    team.players.forEach(player => {
-        const batterEl = document.createElement('div');
-        batterEl.className = 'player-card';
-        batterEl.textContent = player.name;
-        batterEl.addEventListener('click', () => selectBatter(player));
-        battersList.appendChild(batterEl);
-    });
     
     // Add bowlers from opposite team
     const oppositeTeam = gameState.currentInnings === 1 ? gameState.team2 : gameState.team1;
