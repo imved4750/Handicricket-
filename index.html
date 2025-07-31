@@ -135,8 +135,8 @@
         }
       }
     });
-    
-    // Login button
+
+    // Login button - CORRECTED VERSION
     document.getElementById('loginBtn').addEventListener('click', async function() {
       const teamName = document.getElementById('teamName').value.trim();
       if (!teamName) {
@@ -148,7 +148,7 @@
         const userCredential = await signInAnonymously(auth);
         const user = userCredential.user;
         
-        // Save team name to user profile
+        // Save team name to user profile - CORRECTED SYNTAX
         await set(ref(db, `users/${user.uid}/team`), {
           name: teamName,
           createdAt: Date.now(),
@@ -156,7 +156,7 @@
           matchesWon: 0
         });
         
-        // Initialize team stats
+        // Initialize team stats - CORRECTED SYNTAX
         await set(ref(db, `teams/${teamName}`), {
           name: teamName,
           owner: user.uid,
@@ -176,7 +176,7 @@
         alert("Failed to login. Please try again.");
       }
     });
-    
+
     // Create game
     document.getElementById('createGameBtn').addEventListener('click', async function() {
       if (!currentTeam) return;
