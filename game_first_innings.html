@@ -285,6 +285,7 @@
     const room = params.get('room');
     const player = params.get('player');
     const opponent = player === "player1" ? "player2" : "player1";
+    let currentUserId = null;
 
     // DOM elements
     const status = document.getElementById("status");
@@ -344,6 +345,42 @@
     const bowlerRef = ref(db, `rooms/${room}/currentBowler`);
     const inningsRef = ref(db, `rooms/${room}/innings`);
     const startSecondInningsRef = ref(db, `rooms/${room}/startSecondInnings`);
+
+    // Helper function for Firebase increments
+    function increment(value) {
+      return [value, 'increment'];
+    }
+
+    // After a match ends, update player and team stats
+    async function updateStats(matchResult) {
+      if (!currentUserId) return;
+      
+      // Get team name
+      const teamSnap = await get(ref(db, `users/${currentUserId}/team/name`));
+      if (!teamSnap.exists()) return;
+      const teamName = teamSnap.val();
+      
+      // Update team stats
+      const teamUpdates = {
+        matchesPlayed: increment(1),
+        totalRuns: increment(matchResult.runs),
+        totalWickets: increment(matchResult.wickets)
+      };
+      
+      if (matchResult.won) {
+        teamUpdates.matchesWon = increment(1);
+      }
+      
+      await update(ref(db, `teams/${teamName}`), teamUpdates);
+      
+      // Update player stats (simplified example)
+      if (currentBatter) {
+        await update(ref(db, `users/${currentUserId}/squad/${currentBatter.id}`), {
+          runs: increment(matchResult.runs),
+          matches: increment(1)
+        });
+      }
+    }
 
     // Initialize the game
     async function initGame() {
@@ -648,19 +685,29 @@
     // End match and show result
     async function endMatch() {
       let result = "";
+      let won = false;
       
       if (team2Score > team1Score) {
         const winMargin = currentFormat.totalWickets - team2Wickets;
         result = `Team 2 wins by ${winMargin} wickets`;
+        won = player !== battingFirst;
       } else if (team1Score > team2Score) {
         const winMargin = team1Score - team2Score;
         result = `Team 1 wins by ${winMargin} runs`;
+        won = player === battingFirst;
       } else {
         result = "Match tied";
       }
       
       status.innerText = `Match Over! ${result}`;
       disableButtons();
+      
+      // Update stats
+      await updateStats({
+        won: won,
+        runs: runs,
+        wickets: wickets
+      });
       
       // Redirect to results page after delay
       setTimeout(() => {
