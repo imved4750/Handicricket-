@@ -1,20 +1,11 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, get, child, update, remove } from "firebase/database";
-import { 
-  getAuth, 
-  signInAnonymously, 
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup
-} from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCN6aZMwlsZe7JJaovU0WA3UQygWr4jYmA",
   authDomain: "handicricket-85a06.firebaseapp.com",
+  databaseURL: "https://handicricket-85a06-default-rtdb.firebaseio.com",
   projectId: "handicricket-85a06",
   storageBucket: "handicricket-85a06.appspot.com",
   messagingSenderId: "599182538558",
@@ -23,78 +14,34 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getDatabase(app);
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+const db = getDatabase(app);
 
-// Initialize with some sample player data if not exists
-function initializePlayerDatabase() {
-  const playersRef = ref(db, 'players');
-  get(playersRef).then((snapshot) => {
-    if (!snapshot.exists()) {
-      const defaultPlayers = {
-        'virat_kohli': { name: 'Virat Kohli', role: 'batsman', rating: 95 },
-        'joe_root': { name: 'Joe Root', role: 'batsman', rating: 92 },
-        // Add more default players...
-      };
-      set(playersRef, defaultPlayers);
-    }
-  });
-}
-
-initializePlayerDatabase();
-
-// Authentication functions
-async function registerWithEmail(email, password) {
+// Team login system
+const loginTeam = async (teamName) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    const userCredential = await signInAnonymously(auth);
+    const teamRef = ref(db, `teams/${teamName}`);
+    await set(teamRef, {
+      name: teamName,
+      createdAt: Date.now(),
+      lastActive: Date.now()
+    });
+    localStorage.setItem('ihcc_team', teamName);
+    return true;
   } catch (error) {
-    throw error;
+    console.error("Login failed:", error);
+    return false;
   }
-}
+};
 
-async function loginWithEmail(email, password) {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function loginWithGoogle() {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function logout() {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    throw error;
-  }
-}
+// Player database
+const getPlayerDatabase = async () => {
+  const snapshot = await get(ref(db, 'players'));
+  return snapshot.val() || {};
+};
 
 export { 
-  db, 
-  ref, 
-  set, 
-  onValue, 
-  get, 
-  child, 
-  update, 
-  remove, 
-  auth, 
-  signInAnonymously, 
-  onAuthStateChanged,
-  registerWithEmail,
-  loginWithEmail,
-  loginWithGoogle,
-  logout
+  db, ref, set, onValue, get, child, update, remove, 
+  loginTeam, getPlayerDatabase 
 };
