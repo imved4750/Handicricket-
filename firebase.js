@@ -1,6 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, get, child, update, remove } from "firebase/database";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { 
+  getAuth, 
+  signInAnonymously, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -17,6 +26,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
 // Initialize with some sample player data if not exists
 function initializePlayerDatabase() {
@@ -35,4 +45,56 @@ function initializePlayerDatabase() {
 
 initializePlayerDatabase();
 
-export { db, ref, set, onValue, get, child, update, remove, auth, signInAnonymously, onAuthStateChanged };
+// Authentication functions
+async function registerWithEmail(email, password) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function loginWithEmail(email, password) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function loginWithGoogle() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function logout() {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export { 
+  db, 
+  ref, 
+  set, 
+  onValue, 
+  get, 
+  child, 
+  update, 
+  remove, 
+  auth, 
+  signInAnonymously, 
+  onAuthStateChanged,
+  registerWithEmail,
+  loginWithEmail,
+  loginWithGoogle,
+  logout
+};
