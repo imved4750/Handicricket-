@@ -1098,6 +1098,51 @@
   </style>
 </head>
 <body>
+  <!-- Game Flow Analysis (Added as comments) -->
+  <!--
+    =============================================
+    HANDICRICKET GAME FLOW ANALYSIS
+    =============================================
+    
+    1. INITIALIZATION PHASE
+    - Room setup with parameters from URL
+    - Team loading from Firebase
+    - Game format setup (T5, T10, T20, ODI)
+    - Toss determination (batting/bowling first)
+    
+    2. FIRST INNINGS FLOW
+    - Role assignment based on toss
+    - Player selection (batters and bowlers)
+    - Ball-by-ball play with card selection
+    - Special conditions (powerplay, dead overs, free hits)
+    - Over management and transitions
+    - Innings completion and summary
+    
+    3. SECOND INNINGS FLOW
+    - Role switch (teams swap batting/bowling)
+    - Target chase with required run rate
+    - Match conclusion with winner determination
+    
+    4. KEY FEATURES
+    - Real-time Firebase updates
+    - Detailed statistics tracking
+    - Interactive elements (selection, commentary)
+    - Special rules (wicket values, timeouts)
+    - Spectator mode
+    
+    5. UI COMPONENTS
+    - Scoreboard with runs/wickets/overs
+    - Over progress visualization
+    - Player comparison stats
+    - Match timeline and commentary
+    
+    6. GAME END
+    - Comprehensive match summary
+    - Player of the match
+    - Scorecards for both teams
+    - Data persistence options
+  -->
+
   <!-- Stadium Background -->
   <div class="stadium-background"></div>
   
