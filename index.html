@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHCC - International HandiCricket Championship</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="stylesheet" href="styles/broadcast.css">
+</head>
+<body>
+    <div class="broadcast-container">
+        <!-- ICC-style broadcast elements -->
+        <div class="scoreboard">
+            <div class="team-names">
+                <span id="team1-name">TEAM A</span>
+                <span id="team2-name">TEAM B</span>
+            </div>
+            <div class="score-display">
+                <span id="runs">0</span>/<span id="wickets">0.0</span>
+                <span class="overs">(<span id="overs">0.0</span>)</span>
+            </div>
+            <div class="extras">
+                <span id="run-rate">RR: 0.00</span>
+                <span id="target"></span>
+            </div>
+        </div>
+
+        <!-- Player selection area -->
+        <div class="player-selection">
+            <div class="batter-selection">
+                <h3>Select Batter</h3>
+                <div class="players-list" id="batters-list"></div>
+            </div>
+            <div class="bowler-selection">
+                <h3>Select Bowler</h3>
+                <div class="players-list" id="bowlers-list"></div>
+            </div>
+        </div>
+
+        <!-- Card selection interface -->
+        <div class="card-selection">
+            <div class="card-buttons">
+                <button class="card-btn" data-value="0">0</button>
+                <button class="card-btn" data-value="1">1</button>
+                <button class="card-btn" data-value="2">2</button>
+                <button class="card-btn" data-value="3">3</button>
+                <button class="card-btn" data-value="4">4</button>
+                <button class="card-btn" data-value="5">5</button>
+                <button class="card-btn" data-value="6">6</button>
+            </div>
+        </div>
+
+        <!-- Match info and controls -->
+        <div class="match-info">
+            <div class="format-indicator">
+                <span id="match-format">T20</span>
+                <span id="powerplay-status">Powerplay: Yes</span>
+            </div>
+            <div class="controls">
+                <button id="timeout-btn">Timeout (2:00)</button>
+                <button id="reset-btn">Reset Play</button>
+            </div>
+        </div>
+
+        <!-- Commentary and timeline -->
+        <div class="commentary-panel">
+            <div class="commentary-log" id="commentary"></div>
+            <div class="timeline" id="timeline"></div>
+        </div>
+
+        <!-- Player stats comparison -->
+        <div class="player-comparison">
+            <div class="batter-stats">
+                <h4 id="current-batter">Batter</h4>
+                <div class="stats-bar">
+                    <span>Runs: <span id="b-runs">0</span></span>
+                    <span>Balls: <span id="b-balls">0</span></span>
+                    <span>SR: <span id="b-sr">0.00</span></span>
+                </div>
+            </div>
+            <div class="bowler-stats">
+                <h4 id="current-bowler">Bowler</h4>
+                <div class="stats-bar">
+                    <span>Overs: <span id="bowl-overs">0</span></span>
+                    <span>Wkts: <span id="bowl-wkts">0</span></span>
+                    <span>ER: <span id="bowl-er">0.00</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/firebase.js"></script>
+    <script src="scripts/players.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/broadcast.js"></script>
+    <script src="scripts/stats.js"></script>
+    <script src="scripts/audio.js"></script>
+</body>
+</html>
