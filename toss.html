@@ -345,6 +345,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCN6aZMwlsZe7JJaovU0WA3UQygWr4jYmA",
@@ -359,12 +360,12 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
     // Get URL parameters
     const params = new URLSearchParams(window.location.search);
     const room = params.get('room');
     const player = params.get('player');
-    const teamName = decodeURIComponent(params.get('team'));
     const format = params.get('format');
     const opponent = player === "player1" ? "player2" : "player1";
 
@@ -391,246 +392,267 @@
     const formatInfoEl = document.getElementById('formatInfo');
     const playerInfoEl = document.getElementById('playerInfo');
 
-    // Firebase references
-    const roomRef = ref(db, `rooms/${room}`);
-    const tossRef = ref(db, `rooms/${room}/toss`);
-    const playerRef = ref(db, `rooms/${room}/${player}`);
-    const opponentRef = ref(db, `rooms/${room}/${opponent}`);
-
-    // Format names
-    const formatNames = {
-      "5": "T5 (5 Overs)",
-      "10": "T10 (10 Overs)",
-      "20": "T20 (20 Overs)",
-      "50": "ODI (50 Overs)"
-    };
-
-    // Initialize UI
-    roomCodeEl.textContent = room;
-    playerInfoEl.textContent = player === "player1" ? "Player 1 (Team A)" : "Player 2 (Team B)";
-    
-    if (player === "player1") {
-      team1NameEl.textContent = teamName;
-      team1RoleEl.textContent = "(You)";
-      team2RoleEl.textContent = "(Opponent)";
-    } else {
-      team2NameEl.textContent = teamName;
-      team1RoleEl.textContent = "(Opponent)";
-      team2RoleEl.textContent = "(You)";
-    }
-
-    // Set format info
-    if (format) {
-      formatInfoEl.textContent = formatNames[format] || format;
-    } else {
-      // If joining player, get format from room
-      onValue(roomRef, (snap) => {
-        if (snap.exists() && snap.val().player1?.format) {
-          const roomFormat = snap.val().player1.format;
-          formatInfoEl.textContent = formatNames[roomFormat] || roomFormat;
-        }
-      });
-    }
-
-    // Set player online status
-    set(playerRef, {
-      name: teamName,
-      connected: true,
-      team: teamName
-    }).catch(error => {
-      console.error("Error setting player status:", error);
-      tossResult.textContent = "Connection error. Please refresh.";
+    // Initialize with auth state
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      initGame(user.uid);
     });
 
-    // Check if opponent is connected
-    onValue(opponentRef, (snap) => {
-      if (snap.exists() && snap.val().connected) {
-        const opponentName = snap.val().name;
-        if (player === "player1") {
-          team2NameEl.textContent = opponentName || "Team B";
-        } else {
-          team1NameEl.textContent = opponentName || "Team A";
-        }
-        
-        waitingText.textContent = "Opponent connected!";
-        setTimeout(() => {
-          waiting.style.display = "none";
-          initializeTossProcess();
-        }, 1000);
+    async function initGame(userId) {
+      // Get team name from user profile
+      const teamSnap = await get(ref(db, `users/${userId}/team/name`));
+      if (!teamSnap.exists()) {
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      const teamName = teamSnap.val();
+      
+      // Firebase references
+      const roomRef = ref(db, `rooms/${room}`);
+      const tossRef = ref(db, `rooms/${room}/toss`);
+      const playerRef = ref(db, `rooms/${room}/${player}`);
+      const opponentRef = ref(db, `rooms/${room}/${opponent}`);
+
+      // Format names
+      const formatNames = {
+        "5": "T5 (5 Overs)",
+        "10": "T10 (10 Overs)",
+        "20": "T20 (20 Overs)",
+        "50": "ODI (50 Overs)"
+      };
+
+      // Initialize UI
+      roomCodeEl.textContent = room;
+      playerInfoEl.textContent = player === "player1" ? "Player 1 (Team A)" : "Player 2 (Team B)";
+      
+      if (player === "player1") {
+        team1NameEl.textContent = teamName;
+        team1RoleEl.textContent = "(You)";
+        team2RoleEl.textContent = "(Opponent)";
       } else {
-        waitingText.textContent = "Waiting for opponent to connect...";
+        team2NameEl.textContent = teamName;
+        team1RoleEl.textContent = "(Opponent)";
+        team2RoleEl.textContent = "(You)";
+      }
+
+      // Set format info
+      if (format) {
+        formatInfoEl.textContent = formatNames[format] || format;
+      } else {
+        // If joining player, get format from room
+        onValue(roomRef, (snap) => {
+          if (snap.exists() && snap.val().player1?.format) {
+            const roomFormat = snap.val().player1.format;
+            formatInfoEl.textContent = formatNames[roomFormat] || roomFormat;
+          }
+        });
+      }
+
+      // Set player online status
+      set(playerRef, {
+        name: teamName,
+        connected: true,
+        team: teamName
+      }).catch(error => {
+        console.error("Error setting player status:", error);
+        tossResult.textContent = "Connection error. Please refresh.";
+      });
+
+      // Check if opponent is connected
+      onValue(opponentRef, (snap) => {
+        if (snap.exists() && snap.val().connected) {
+          const opponentName = snap.val().name;
+          if (player === "player1") {
+            team2NameEl.textContent = opponentName || "Team B";
+          } else {
+            team1NameEl.textContent = opponentName || "Team A";
+          }
+          
+          waitingText.textContent = "Opponent connected!";
+          setTimeout(() => {
+            waiting.style.display = "none";
+            initializeTossProcess();
+          }, 1000);
+        } else {
+          waitingText.textContent = "Waiting for opponent to connect...";
+          waiting.style.display = "block";
+          callSection.style.display = "none";
+          flipSection.style.display = "none";
+        }
+      });
+
+      // Initialize toss process based on player role
+      function initializeTossProcess() {
+        onValue(tossRef, (snap) => {
+          const tossData = snap.exists() ? snap.val() : {};
+          
+          // Player 1 calls, Player 2 flips
+          if (player === "player1" && !tossData.caller) {
+            tossResult.textContent = "Please call Heads or Tails";
+            callSection.style.display = "block";
+            flipSection.style.display = "none";
+          } 
+          else if (player === "player2" && tossData.caller === "player1" && !tossData.flipper) {
+            tossResult.textContent = "Opponent has called. Please flip the coin.";
+            callSection.style.display = "none";
+            flipSection.style.display = "block";
+          }
+          // If toss is complete, show result
+          else if (tossData.result) {
+            handleTossResult(tossData);
+          }
+        });
+      }
+
+      // Handle toss selection (Player 1 calls)
+      headsBtn.addEventListener('click', () => makeTossCall('heads'));
+      tailsBtn.addEventListener('click', () => makeTossCall('tails'));
+
+      function makeTossCall(choice) {
+        callSection.style.display = "none";
         waiting.style.display = "block";
+        waitingText.textContent = "Waiting for opponent to flip...";
+        
+        update(tossRef, {
+          caller: player,
+          call: choice
+        }).catch(error => {
+          console.error("Error setting toss call:", error);
+          tossResult.textContent = "Error submitting call. Please try again.";
+          callSection.style.display = "block";
+          waiting.style.display = "none";
+        });
+      }
+
+      // Handle coin flip (Player 2 flips)
+      flipBtn.addEventListener('click', flipCoin);
+
+      function flipCoin() {
+        flipSection.style.display = "none";
+        waiting.style.display = "block";
+        waitingText.textContent = "Flipping coin...";
+        
+        // Animate coin flip (5 rotations)
+        coin.classList.add('flipping');
+        
+        // After animation, determine result
+        setTimeout(() => {
+          coin.classList.remove('flipping');
+          determineTossResult();
+        }, 5000); // Matches the animation duration (1s * 5 rotations)
+      }
+
+      function determineTossResult() {
+        const result = Math.random() < 0.5 ? 'heads' : 'tails';
+        
+        get(tossRef).then((snap) => {
+          const tossData = snap.exists() ? snap.val() : {};
+          const call = tossData.call;
+          const winner = call === result ? "player1" : "player2";
+          
+          // Show the actual result on the coin
+          if (result === 'heads') {
+            coin.style.transform = 'rotateY(0deg)';
+          } else {
+            coin.style.transform = 'rotateY(180deg)';
+          }
+          
+          update(tossRef, {
+            flipper: player,
+            result: result,
+            winner: winner
+          }).catch(error => {
+            console.error("Error setting toss result:", error);
+            tossResult.textContent = "Error processing toss. Please try again.";
+            flipSection.style.display = "block";
+            waiting.style.display = "none";
+          });
+        });
+      }
+
+      // Handle toss result
+      function handleTossResult(tossData) {
+        waiting.style.display = "none";
         callSection.style.display = "none";
         flipSection.style.display = "none";
-      }
-    });
-
-    // Initialize toss process based on player role
-    function initializeTossProcess() {
-      onValue(tossRef, (snap) => {
-        const tossData = snap.exists() ? snap.val() : {};
         
-        // Player 1 calls, Player 2 flips
-        if (player === "player1" && !tossData.caller) {
-          tossResult.textContent = "Please call Heads or Tails";
-          callSection.style.display = "block";
-          flipSection.style.display = "none";
-        } 
-        else if (player === "player2" && tossData.caller === "player1" && !tossData.flipper) {
-          tossResult.textContent = "Opponent has called. Please flip the coin.";
-          callSection.style.display = "none";
-          flipSection.style.display = "block";
-        }
-        // If toss is complete, show result
-        else if (tossData.result) {
-          handleTossResult(tossData);
-        }
-      });
-    }
-
-    // Handle toss selection (Player 1 calls)
-    headsBtn.addEventListener('click', () => makeTossCall('heads'));
-    tailsBtn.addEventListener('click', () => makeTossCall('tails'));
-
-    function makeTossCall(choice) {
-      callSection.style.display = "none";
-      waiting.style.display = "block";
-      waitingText.textContent = "Waiting for opponent to flip...";
-      
-      update(tossRef, {
-        caller: player,
-        call: choice
-      }).catch(error => {
-        console.error("Error setting toss call:", error);
-        tossResult.textContent = "Error submitting call. Please try again.";
-        callSection.style.display = "block";
-        waiting.style.display = "none";
-      });
-    }
-
-    // Handle coin flip (Player 2 flips)
-    flipBtn.addEventListener('click', flipCoin);
-
-    function flipCoin() {
-      flipSection.style.display = "none";
-      waiting.style.display = "block";
-      waitingText.textContent = "Flipping coin...";
-      
-      // Animate coin flip (5 rotations)
-      coin.classList.add('flipping');
-      
-      // After animation, determine result
-      setTimeout(() => {
-        coin.classList.remove('flipping');
-        determineTossResult();
-      }, 5000); // Matches the animation duration (1s * 5 rotations)
-    }
-
-    function determineTossResult() {
-      const result = Math.random() < 0.5 ? 'heads' : 'tails';
-      
-      get(tossRef).then((snap) => {
-        const tossData = snap.exists() ? snap.val() : {};
+        const result = tossData.result;
+        const winner = tossData.winner;
         const call = tossData.call;
-        const winner = call === result ? "player1" : "player2";
         
-        // Show the actual result on the coin
+        // Show the final coin position
         if (result === 'heads') {
           coin.style.transform = 'rotateY(0deg)';
         } else {
           coin.style.transform = 'rotateY(180deg)';
         }
         
-        update(tossRef, {
-          flipper: player,
-          result: result,
-          winner: winner
-        }).catch(error => {
-          console.error("Error setting toss result:", error);
-          tossResult.textContent = "Error processing toss. Please try again.";
-          flipSection.style.display = "block";
+        if (player === winner) {
+          tossResult.innerHTML = `
+            <strong>Toss Result:</strong> ${result.toUpperCase()}!<br>
+            You won the toss! (Opponent called ${call})
+          `;
+          battingOptions.style.display = "flex";
+        } else {
+          tossResult.innerHTML = `
+            <strong>Toss Result:</strong> ${result.toUpperCase()}!<br>
+            Opponent won the toss. (They called ${call})
+          `;
+          waitingText.textContent = "Waiting for opponent to choose...";
+          waiting.style.display = "block";
+        }
+        
+        // If toss winner has made batting choice
+        if (tossData.battingFirst) {
           waiting.style.display = "none";
+          battingOptions.style.display = "none";
+          tossOutcome.style.display = "block";
+          
+          const battingFirst = tossData.battingFirst;
+          const battingTeam = battingFirst === 'player1' ? team1NameEl.textContent : team2NameEl.textContent;
+          
+          tossOutcome.innerHTML = `
+            <strong>Toss Outcome:</strong><br>
+            ${battingTeam} chose to ${tossData.battingChoice === 'bat' ? 'bat' : 'bowl'} first.
+          `;
+          continueBtn.style.display = "block";
+        }
+      }
+
+      // Handle batting choice
+      batBtn.addEventListener('click', () => makeBattingChoice('bat'));
+      bowlBtn.addEventListener('click', () => makeBattingChoice('bowl'));
+
+      function makeBattingChoice(choice) {
+        const battingFirst = choice === 'bat' ? player : opponent;
+        
+        update(tossRef, {
+          battingFirst: battingFirst,
+          battingChoice: choice
+        }).catch(error => {
+          console.error("Error setting batting choice:", error);
+          tossResult.textContent = "Error submitting choice. Please try again.";
+        });
+      }
+
+      // Continue to team selection
+      continueBtn.addEventListener('click', () => {
+        window.location.href = `playing11.html?room=${room}&player=${player}&team=${encodeURIComponent(teamName)}`;
+      });
+
+      // Handle page refresh/disconnect
+      window.addEventListener('beforeunload', () => {
+        set(playerRef, {
+          name: teamName,
+          connected: false
         });
       });
     }
-
-    // Handle toss result
-    function handleTossResult(tossData) {
-      waiting.style.display = "none";
-      callSection.style.display = "none";
-      flipSection.style.display = "none";
-      
-      const result = tossData.result;
-      const winner = tossData.winner;
-      const call = tossData.call;
-      
-      // Show the final coin position
-      if (result === 'heads') {
-        coin.style.transform = 'rotateY(0deg)';
-      } else {
-        coin.style.transform = 'rotateY(180deg)';
-      }
-      
-      if (player === winner) {
-        tossResult.innerHTML = `
-          <strong>Toss Result:</strong> ${result.toUpperCase()}!<br>
-          You won the toss! (Opponent called ${call})
-        `;
-        battingOptions.style.display = "flex";
-      } else {
-        tossResult.innerHTML = `
-          <strong>Toss Result:</strong> ${result.toUpperCase()}!<br>
-          Opponent won the toss. (They called ${call})
-        `;
-        waitingText.textContent = "Waiting for opponent to choose...";
-        waiting.style.display = "block";
-      }
-      
-      // If toss winner has made batting choice
-      if (tossData.battingFirst) {
-        waiting.style.display = "none";
-        battingOptions.style.display = "none";
-        tossOutcome.style.display = "block";
-        
-        const battingFirst = tossData.battingFirst;
-        const battingTeam = battingFirst === 'player1' ? team1NameEl.textContent : team2NameEl.textContent;
-        
-        tossOutcome.innerHTML = `
-          <strong>Toss Outcome:</strong><br>
-          ${battingTeam} chose to ${tossData.battingChoice === 'bat' ? 'bat' : 'bowl'} first.
-        `;
-        continueBtn.style.display = "block";
-      }
-    }
-
-    // Handle batting choice
-    batBtn.addEventListener('click', () => makeBattingChoice('bat'));
-    bowlBtn.addEventListener('click', () => makeBattingChoice('bowl'));
-
-    function makeBattingChoice(choice) {
-      const battingFirst = choice === 'bat' ? player : opponent;
-      
-      update(tossRef, {
-        battingFirst: battingFirst,
-        battingChoice: choice
-      }).catch(error => {
-        console.error("Error setting batting choice:", error);
-        tossResult.textContent = "Error submitting choice. Please try again.";
-      });
-    }
-
-    // Continue to team selection
-    continueBtn.addEventListener('click', () => {
-      window.location.href = `playing11.html?room=${room}&player=${player}&team=${encodeURIComponent(teamName)}`;
-    });
-
-    // Handle page refresh/disconnect
-    window.addEventListener('beforeunload', () => {
-      set(playerRef, {
-        name: teamName,
-        connected: false
-      });
-    });
   </script>
 </body>
 </html>
