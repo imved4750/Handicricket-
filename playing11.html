@@ -69,36 +69,36 @@
       font-size: 1.1rem;
     }
     
-    .player-input {
+    .player-selection {
       display: flex;
-      margin: 8px 0 10px 0;
-      width: 100%;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
     }
     
-    .player-input input {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 5px 0 0 5px;
+    .player-selection select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
       border: none;
       background: rgba(255,255,255,0.9);
       font-size: 14px;
-      min-width: 0; /* Allows input to shrink properly */
+      min-height: 100px;
     }
     
-    .player-input button {
-      padding: 8px 12px;
-      border-radius: 0 5px 5px 0;
+    .player-selection button {
+      padding: 8px;
+      border-radius: 5px;
       border: none;
-      background: #f44336;
+      background: #4CAF50;
       color: white;
       cursor: pointer;
       transition: all 0.2s;
       font-size: 14px;
-      white-space: nowrap;
     }
     
-    .player-input button:hover {
-      background: #d32f2f;
+    .player-selection button:hover {
+      background: #388E3C;
     }
     
     .player-list {
@@ -119,7 +119,7 @@
       align-items: center;
       font-size: 13px;
       transition: all 0.2s;
-      width: calc(100% - 16px); /* Adjusted width */
+      width: calc(100% - 16px);
     }
     
     .player-list li:hover {
@@ -225,9 +225,11 @@
     <div class="team-selection">
       <div class="team-box">
         <h2 id="yourTeamName">Your Team</h2>
-        <div class="player-input">
-          <input type="text" id="playerNameInput" placeholder="Player name">
-          <button id="addPlayerBtn">Add</button>
+        <div class="player-selection">
+          <select id="squadPlayers" multiple>
+            <!-- Will be populated from squad -->
+          </select>
+          <button id="addToTeamBtn">Add to Playing 11</button>
         </div>
         <ul class="player-list" id="playerList"></ul>
         <p class="player-count" id="playerCount">Players: 0/11</p>
@@ -252,7 +254,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCN6aZMwlsZe7JJaovU0WA3UQygWr4jYmA",
@@ -266,6 +269,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('room');
@@ -283,8 +287,8 @@
     const playerRef = ref(db, `rooms/${roomId}/${player}`);
     const opponentRef = ref(db, `rooms/${roomId}/${opponent}`);
 
-    const playerNameInput = document.getElementById('playerNameInput');
-    const addPlayerBtn = document.getElementById('addPlayerBtn');
+    const squadPlayersSelect = document.getElementById('squadPlayers');
+    const addToTeamBtn = document.getElementById('addToTeamBtn');
     const playerList = document.getElementById('playerList');
     const playerCount = document.getElementById('playerCount');
     const submitTeamBtn = document.getElementById('submitTeamBtn');
@@ -297,85 +301,121 @@
     const battingTeam = document.getElementById('battingTeam');
 
     let players = [];
+    let squadPlayers = [];
     let opponentPlayers = [];
     let opponentTeamName = '';
     let tossWinner = '';
     let battingFirst = '';
+    let currentUserId = null;
 
-    // Set player online status
-    set(playerRef, true).catch(error => {
-      console.error('Connection error:', error);
+    // Initialize with auth state
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      currentUserId = user.uid;
+      initGame();
     });
 
-    // Load toss and team info
-    onValue(roomRef, (snap) => {
-      if (snap.exists()) {
-        const room = snap.val();
-        
-        // Set team names
-        yourTeamName.textContent = teamName;
-        opponentTeamName = player === 'player1' ? 
-          (room.player2?.team || 'Team B') : 
-          (room.player1?.team || 'Team A');
-        
-        // Set toss info
-        if (room.toss) {
-          tossWinner = room.toss.winner;
-          battingFirst = room.toss.battingFirst;
+    async function initGame() {
+      // Set player online status
+      set(playerRef, true).catch(error => {
+        console.error('Connection error:', error);
+      });
+
+      // Load squad players
+      const squadSnap = await get(ref(db, `users/${currentUserId}/squad`));
+      if (squadSnap.exists()) {
+        squadPlayers = Object.values(squadSnap.val());
+        populateSquadSelect();
+      }
+      
+      // Load room data
+      onValue(roomRef, (snap) => {
+        if (snap.exists()) {
+          const room = snap.val();
           
-          const winnerName = room.toss.winner === 'player1' ? 
-            room.player1?.team || 'Team A' : 
-            room.player2?.team || 'Team B';
+          // Set team names
+          yourTeamName.textContent = teamName;
+          opponentTeamName = player === 'player1' ? 
+            (room.player2?.team || 'Team B') : 
+            (room.player1?.team || 'Team A');
           
-          const battingFirstName = room.toss.battingFirst === 'player1' ? 
-            room.player1?.team || 'Team A' : 
-            room.player2?.team || 'Team B';
+          // Set toss info
+          if (room.toss) {
+            tossWinner = room.toss.winner;
+            battingFirst = room.toss.battingFirst;
+            
+            const winnerName = room.toss.winner === 'player1' ? 
+              room.player1?.team || 'Team A' : 
+              room.player2?.team || 'Team B';
+            
+            const battingFirstName = room.toss.battingFirst === 'player1' ? 
+              room.player1?.team || 'Team A' : 
+              room.player2?.team || 'Team B';
+            
+            tossSummary.textContent = `Toss won by ${winnerName}`;
+            battingTeam.textContent = `${battingFirstName} chose to ${room.toss.battingChoice === 'bat' ? 'bat' : 'bowl'} first`;
+          }
           
-          tossSummary.textContent = `Toss won by ${winnerName}`;
-          battingTeam.textContent = `${battingFirstName} chose to ${room.toss.battingChoice === 'bat' ? 'bat' : 'bowl'} first`;
-        }
-        
-        // Load opponent team if available
-        if (room.teams && room.teams[opponent]) {
-          opponentPlayers = room.teams[opponent].players || [];
-          updateOpponentPlayerList();
-          
-          // Show start button for player1 if both teams submitted
-          if (player === 'player1' && room.teams.player1 && room.teams.player2) {
-            startMatchBtn.style.display = 'inline-block';
-            waitingForOpponent.style.display = 'none';
-          } else if (player === 'player2' && room.teams.player1 && room.teams.player2) {
-            // Auto-redirect player2 to game page
-            window.location.href = `game_first_innings.html?room=${roomId}&player=${player}`;
+          // Load opponent team if available
+          if (room.teams && room.teams[opponent]) {
+            opponentPlayers = room.teams[opponent].players || [];
+            updateOpponentPlayerList();
+            
+            // Show start button for player1 if both teams submitted
+            if (player === 'player1' && room.teams.player1 && room.teams.player2) {
+              startMatchBtn.style.display = 'inline-block';
+              waitingForOpponent.style.display = 'none';
+            } else if (player === 'player2' && room.teams.player1 && room.teams.player2) {
+              // Auto-redirect player2 to game page
+              window.location.href = `game_first_innings.html?room=${roomId}&player=${player}`;
+            }
           }
         }
-      }
-    });
+      });
 
-    // Add player to team
-    addPlayerBtn.addEventListener('click', () => {
-      const playerName = playerNameInput.value.trim();
-      if (!playerName) return;
+      // Auto-redirect player2 when both teams are ready
+      onValue(teamsRef, (snap) => {
+        if (snap.exists() && snap.val().player1 && snap.val().player2 && player === 'player2') {
+          window.location.href = `game_first_innings.html?room=${roomId}&player=${player}`;
+        }
+      });
+
+      // Handle opponent disconnect
+      onValue(opponentRef, (snap) => {
+        if (!snap.exists() || !snap.val()) {
+          alert('Opponent disconnected');
+          window.location.href = 'index.html';
+        }
+      });
+    }
+    
+    function populateSquadSelect() {
+      squadPlayersSelect.innerHTML = squadPlayers
+        .map(player => `<option value="${player.id}">${player.name} (${player.role})</option>`)
+        .join('');
+    }
+    
+    // Add player from squad to playing 11
+    addToTeamBtn.addEventListener('click', function() {
+      const selectedOptions = Array.from(squadPlayersSelect.selectedOptions);
       
-      if (players.length >= 11) {
+      if (players.length + selectedOptions.length > 11) {
         alert('Maximum 11 players allowed');
         return;
       }
       
-      if (players.includes(playerName)) {
-        alert('Player already added');
-        return;
-      }
+      selectedOptions.forEach(option => {
+        const player = squadPlayers.find(p => p.id === option.value);
+        if (player && !players.includes(player.name)) {
+          players.push(player.name);
+        }
+      });
       
-      players.push(playerName);
       updatePlayerList();
-      playerNameInput.value = '';
-      
-      if (players.length >= 11) {
-        playerNameInput.disabled = true;
-        addPlayerBtn.disabled = true;
-      }
-      
       submitTeamBtn.disabled = players.length < 2;
     });
 
@@ -383,12 +423,6 @@
     function removePlayer(index) {
       players.splice(index, 1);
       updatePlayerList();
-      
-      if (players.length < 11) {
-        playerNameInput.disabled = false;
-        addPlayerBtn.disabled = false;
-      }
-      
       submitTeamBtn.disabled = players.length < 2;
     }
 
@@ -443,28 +477,6 @@
       }).then(() => {
         window.location.href = `game_first_innings.html?room=${roomId}&player=${player}`;
       });
-    });
-
-    // Auto-redirect player2 when both teams are ready
-    onValue(teamsRef, (snap) => {
-      if (snap.exists() && snap.val().player1 && snap.val().player2 && player === 'player2') {
-        window.location.href = `game_first_innings.html?room=${roomId}&player=${player}`;
-      }
-    });
-
-    // Handle opponent disconnect
-    onValue(opponentRef, (snap) => {
-      if (!snap.exists() || !snap.val()) {
-        alert('Opponent disconnected');
-        window.location.href = 'index.html';
-      }
-    });
-
-    // Add player on Enter key
-    playerNameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        addPlayerBtn.click();
-      }
     });
 
     // Make removePlayer function available globally
