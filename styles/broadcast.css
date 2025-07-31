@@ -236,4 +236,10 @@
     }
     
     .player-selection, .commentary-panel, .player-comparison {
-        flex-direction
+        flex-direction: column;
+    }
+    
+    .card-buttons {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
