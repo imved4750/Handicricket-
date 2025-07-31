@@ -1,0 +1,112 @@
+/* Boundary animations */
+@keyframes boundaryFlash {
+    0% { background-color: rgba(255, 255, 0, 0.5); }
+    100% { background-color: transparent; }
+}
+
+.boundary-animation {
+    animation: boundaryFlash 1s ease-in-out;
+}
+
+/* Wicket animations */
+@keyframes wicketShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.wicket-animation {
+    animation: wicketShake 0.5s ease-in-out;
+    color: red;
+}
+
+/* Ball trail animation */
+.ball-trail {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    z-index: 100;
+    animation: ballTrail 1s linear forwards;
+}
+
+@keyframes ballTrail {
+    0% { 
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(var(--end-x), var(--end-y));
+        opacity: 0;
+    }
+}
+
+/* Confetti animation */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    opacity: 0;
+    z-index: 999;
+    animation: confettiFall 5s linear forwards;
+}
+
+@keyframes confettiFall {
+    0% { 
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Umpire signal animations */
+.umpire-signal {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 3rem;
+    opacity: 0;
+    animation: signalAppear 2s ease-in-out;
+    z-index: 1000;
+}
+
+@keyframes signalAppear {
+    0% { opacity: 0; transform: scale(0.5); }
+    20% { opacity: 1; transform: scale(1.2); }
+    80% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(0.5); }
+}
+
+/* Player walkout animation */
+.player-walkout {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    white-space: nowrap;
+    animation: walkIn 3s ease-in-out;
+    z-index: 1000;
+}
+
+@keyframes walkIn {
+    0% { transform: translateX(-150%); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Screen shake for boundaries */
+@keyframes screenShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.screen-shake {
+    animation: screenShake 0.5s ease-in-out;
+}
