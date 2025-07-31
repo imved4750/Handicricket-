@@ -262,26 +262,34 @@
     .cards {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
+      gap: 5px; /* Reduced gap */
+    }
+    
+    .card {
+      aspect-ratio: 1/1;
+      width: 40px; /* Fixed width */
+      height: 40px; /* Fixed height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 136, 229, 0.2);
+      border-radius: 8px;
+      font-size: 1.2rem; /* Smaller font */
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 0 auto; /* Center cards */
     }
     
     @media (max-width: 768px) {
       .cards {
         grid-template-columns: repeat(4, 1fr);
       }
-    }
-    
-    .card {
-      aspect-ratio: 1/1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(30, 136, 229, 0.2);
-      border-radius: 8px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
+      .card {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+      }
     }
     
     .card:hover {
@@ -1711,34 +1719,43 @@
           gameState.team1Name = roomData.teams?.player1?.name || 'Team A';
           gameState.team2Name = roomData.teams?.player2?.name || 'Team B';
           
-          // Set toss result
-          if (roomData.toss) {
-            gameState.battingTeam = roomData.toss.battingFirst;
-            gameState.bowlingTeam = roomData.toss.battingFirst === 'player1' ? 'player2' : 'player1';
-            gameState.tossCompleted = true;
-            
-            // Set initial batter and bowler
-            if (gameState.players[gameState.battingTeam]?.length > 0) {
-              gameState.currentBatter = gameState.players[gameState.battingTeam][0];
+          // Check if both players are connected
+          const player1Connected = roomData.player1?.connected;
+          const player2Connected = roomData.player2?.connected;
+          
+          if (player1Connected && player2Connected) {
+            // Set toss result
+            if (roomData.toss) {
+              gameState.battingTeam = roomData.toss.battingFirst;
+              gameState.bowlingTeam = roomData.toss.battingFirst === 'player1' ? 'player2' : 'player1';
+              gameState.tossCompleted = true;
+              
+              // Set initial batter and bowler
+              if (gameState.players[gameState.battingTeam]?.length > 0) {
+                gameState.currentBatter = gameState.players[gameState.battingTeam][0];
+              }
+              
+              if (gameState.players[gameState.bowlingTeam]?.length > 0) {
+                gameState.currentBowler = gameState.players[gameState.bowlingTeam][0];
+              }
+              
+              // Initialize stats
+              initializePlayerStats();
+              
+              // Start game
+              gameState.gameStarted = true;
+              updateGameState();
+              
+              // Show selection prompts if needed
+              if (playerRole === gameState.battingTeam && !gameState.currentBatter) {
+                showPlayerSelectionModal('batter', 'Select opening batter');
+              } else if (playerRole === gameState.bowlingTeam && !gameState.currentBowler) {
+                showPlayerSelectionModal('bowler', 'Select opening bowler');
+              }
             }
-            
-            if (gameState.players[gameState.bowlingTeam]?.length > 0) {
-              gameState.currentBowler = gameState.players[gameState.bowlingTeam][0];
-            }
-            
-            // Initialize stats
-            initializePlayerStats();
-            
-            // Start game
-            gameState.gameStarted = true;
-            updateGameState();
-            
-            // Show selection prompts if needed
-            if (playerRole === gameState.battingTeam && !gameState.currentBatter) {
-              showPlayerSelectionModal('batter', 'Select opening batter');
-            } else if (playerRole === gameState.bowlingTeam && !gameState.currentBowler) {
-              showPlayerSelectionModal('bowler', 'Select opening bowler');
-            }
+          } else {
+            // If not both players connected, wait and check again
+            setTimeout(initializeGame, 1000);
           }
         }
       }).catch(error => {
@@ -2549,9 +2566,6 @@
 
     // Show player selection modal
     function showPlayerSelectionModal(type, title) {
-      if (playerRole !== gameState.battingTeam && type === 'batter') return;
-      if (playerRole !== gameState.bowlingTeam && type === 'bowler') return;
-      
       modalTitleEl.textContent = title;
       modalPlayerListEl.innerHTML = '';
       
